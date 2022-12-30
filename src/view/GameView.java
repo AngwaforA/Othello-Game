@@ -12,6 +12,10 @@ public class GameView extends PApplet implements IView{
     final int yOffSet = 50;
     final  int sizeOfTile = 80;
     final int sizeOfBorder = 1;
+    final int xDisc = sizeOfTile/2;
+    final int yDisc = sizeOfTile/2;
+    boolean  mouseOnDisc = false;
+    boolean locked = false;
 
     public  void  settings(){
         super.size(1000, 700);
@@ -24,10 +28,16 @@ public class GameView extends PApplet implements IView{
     public  void setUpBoard(int[] grid){
         noStroke();
         colorMode(0,35,100,25);
+        //controller.drawFreeMove();
     }
 
     public void draw(){
         controller.nextFrame();
+        controller.drawFreeMove();
+        if(mouseX > xDisc-sizeOfTile-1 && mouseX < xDisc+sizeOfTile-1 &&
+            mouseY > yDisc - sizeOfTile-1 && mouseY < yDisc+sizeOfTile-1){
+            mouseOnDisc = true;
+        }
     }
     @Override
     public  void drawBoard(int[] grid){
@@ -35,9 +45,9 @@ public class GameView extends PApplet implements IView{
         int i = 0;
         int X, Y;
         for (int y = 0; y < edge_length; y++) {
-            Y = yPos + yOffSet + sizeOfBorder + y * (sizeOfTile + sizeOfBorder);
+            Y = yOffSet + sizeOfBorder + y * (sizeOfTile + sizeOfBorder);
             for (int x = 0; x < edge_length; x++) {
-                X = xPos + xOffSet + sizeOfBorder + x * (sizeOfTile + sizeOfBorder);
+                X = xOffSet + sizeOfBorder + x * (sizeOfTile + sizeOfBorder);
                 fill(color(30 + log(grid[i] + 1) / log(2) * 10, 90, 80));
                 rect(X, Y, sizeOfTile, sizeOfTile, 15);
                 if (grid[i] == 1) {
@@ -53,6 +63,30 @@ public class GameView extends PApplet implements IView{
                 i++;
             }
 
+        }
+    }
+    @Override
+    public void  mouseClicked(){
+        if(mouseOnDisc){
+            locked = true;
+            fill(0);
+            controller.mouseAction();
+        }
+    }
+    public void representFreeMove(int[] grid){
+        int edge_length = Math.round(sqrt(grid.length));
+        int i = 0;
+        int X, Y;
+        for (int y = 0; y < edge_length; y++) {
+            Y = yPos + yOffSet + sizeOfBorder + y * (sizeOfTile + sizeOfBorder);
+            for (int x = 0; x < edge_length; x++) {
+                X = xPos + xOffSet + sizeOfBorder + x * (sizeOfTile + sizeOfBorder);
+                if (grid[i] == -1) {
+                    fill(color(255, 0, 0));
+                    ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
+                    text(grid[i], X + sizeOfTile / 2 + 1, Y + sizeOfTile / 2 + 1);
+                }
+            }
         }
     }
 }
