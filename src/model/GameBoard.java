@@ -1,10 +1,10 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.function.Consumer;
+import java.util.Random;
 
-public class GameBoard {
+public class GameBoard extends Thread{
     /**
     * freeMove represents the places on the board which is possible for a player to make a move
     * */
@@ -35,7 +35,7 @@ public class GameBoard {
     /**
      * The Hashset is used to store the freeMoves
      * */
-    public HashSet<Integer> freeMoves = new HashSet<>();
+    public ArrayList<Integer> freeMoves = new ArrayList<>();
 
 
     /**
@@ -53,11 +53,9 @@ public class GameBoard {
      * 1 represents the white and 2 the black
      * */
     public GameBoard() {
-        gameBoard[20] = 1;
-        gameBoard[26] = 2;
-        gameBoard[27] = 2;
+        gameBoard[27] = 1;
         gameBoard[36] = 1;
-        gameBoard[28] = 1;
+        gameBoard[28] = 2;
         gameBoard[35] = 2;
         playerWhite.setTurn(true);
         playerBlack.setTurn(false);
@@ -90,7 +88,7 @@ public class GameBoard {
     }
     }
     */
-    void move(int pos) {
+    public void move(int pos) {
         int chip = playerWhite.getTurn() ? 1 : 2;
         int oppositeChip = chip == 1 ? 2 : 1;
         iterateGameBoardForFreeMove(chip);
@@ -142,7 +140,23 @@ public class GameBoard {
         }
     }
 
-    void switchTurns() {
+    public void cpuMove(){
+        int chip = playerWhite.getTurn() ? 1 : 2;
+        if(playerBlack.getTurn()){
+            iterateGameBoardForFreeMove(chip);
+        }
+        if(freeMoves.isEmpty()){
+            switchTurns();
+        }
+        else{
+            int size = freeMoves.size();
+            int anyMove = new Random().nextInt(size);
+            int chosenMove = freeMoves.get(anyMove);
+            move(chosenMove);
+        }
+    }
+    void
+    switchTurns() {
         if(!playerWhite.getTurn()) {
             playerWhite.setTurn(true);
             playerBlack.setTurn(false);
@@ -186,7 +200,7 @@ public class GameBoard {
             }
         }
         freeMoves.stream().forEach(System.out::println);
-        System.out.println("[" + this + "]");
+        //System.out.println("[" + this + "]");
     }
     /**
      *Checks for free moves horizontally in a backward direction in reference to one player only
@@ -254,6 +268,10 @@ public class GameBoard {
             return true;
         }
         return false;
+    }
+
+    public boolean isPlayerWhitesTurn(){
+        return playerWhite.getTurn();
     }
 
     /**
