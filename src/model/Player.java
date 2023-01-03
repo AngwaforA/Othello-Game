@@ -5,7 +5,7 @@ public class Player {
     /**
      * Turn is a boolean used to switch turns between the players
      * It is set to false when the first player has had his turn. In this way the next player gets the turn*/
-private boolean turn;
+private boolean turn = true;
     /**
      * A setter is used to initialize turn*/
     public void setTurn(boolean turn ) {
