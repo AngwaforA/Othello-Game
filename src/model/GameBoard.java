@@ -1,8 +1,11 @@
 package model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
-public class GameBoard extends Thread {
+public class GameBoard{
     /**
      * freeMove represents the places on the board which is possible for a player to make a move
      */
@@ -38,23 +41,24 @@ public class GameBoard extends Thread {
 
     private int score = 0;
 
-    public List<Integer> getFreeMoves(){
+    public List<Integer> getFreeMoves() {
         return freeMoves;
     }
 
-    public  GameBoard(ArrayList<Integer> freeMoves){
+    /*public GameBoard(ArrayList<Integer> freeMoves) {
         this.freeMoves = freeMoves;
     }
 
-    public void run(){
+    public void run() {
 
-    }
+    }*/
+
     /**
      * The board of the game is represented with a single dimensional array with 64 elements
      */
     public int[] gameBoard = new int[64];
-    private long blackChips =  Arrays.stream(gameBoard).filter(i -> i == 2).count();
-    private long whiteChips =  Arrays.stream(gameBoard).filter(i -> i == 1).count();
+    private long blackChips = Arrays.stream(gameBoard).filter(i -> i == 2).count();
+    private long whiteChips = Arrays.stream(gameBoard).filter(i -> i == 1).count();
 
     int temp = 0;
     int end = 0;
@@ -110,15 +114,15 @@ public class GameBoard extends Thread {
         }
         if (freeMoves.contains(pos)) {
             gameBoard[pos] = chip;
-            for(int i = 0;i < directionForFreeMoves.size();i++) {
-                if(directionForFreeMoves.get(i).position == pos) {
+            for (int i = 0; i < directionForFreeMoves.size(); i++) {
+                if (directionForFreeMoves.get(i).position == pos) {
                     switch (directionForFreeMoves.get(i).direction) {
                         case "horizontalBackward":
-                            iterateToFlip(1, pos , chip, oppositeChip, true);
+                            iterateToFlip(1, pos, chip, oppositeChip, true);
                             break;
 
                         case "horizontalForward":
-                            iterateToFlip(1, pos , chip, oppositeChip, false);
+                            iterateToFlip(1, pos, chip, oppositeChip, false);
                             break;
 
                         case "verticalForward":
@@ -178,18 +182,20 @@ public class GameBoard extends Thread {
         }
     }
 
-    void iterateToFlip(int steps,int pos,int chip,int oppositeChip,boolean isIncreasing){
-        if(!isIncreasing) {
+    void iterateToFlip(int steps, int pos, int chip, int oppositeChip, boolean isIncreasing) {
+        if (!isIncreasing) {
             steps = steps * -1;
         }
         pos = pos + steps;
-        while(gameBoard[pos] == oppositeChip) {
+        while (gameBoard[pos] == oppositeChip) {
 
             gameBoard[pos] = chip;
             pos = pos + steps;
         }
 
     }
+
+
 
     public void cpuMove() {
         int chip = playerBlack.getTurn() ? 2 : 1;
@@ -203,11 +209,18 @@ public class GameBoard extends Thread {
             int size = freeMoves.size();
             int anyMove = new Random().nextInt(size);
             int chosenMove = freeMoves.get(anyMove);
+            try {
+                System.out.println("Going to sleep");
+                Thread.sleep(1000);
+                System.out.println("Waking up");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             move(chosenMove);
             System.out.println("playing " + chosenMove);
-
         }
     }
+
 
     void
     switchTurns() {

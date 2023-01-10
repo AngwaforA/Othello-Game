@@ -26,14 +26,13 @@ public class GameView extends PApplet implements IView {
 
     public void settings() {
         super.size(1000, 700);
-
     }
 
     public void setup() {
+
         background(0);
         this.controller = new ControllerOfGame(this);
-        //controller.nextFrame();
-
+        controller.nextFrame();
     }
 
     @Override
@@ -43,7 +42,7 @@ public class GameView extends PApplet implements IView {
     }
 
     public void draw() {
-        controller.nextFrame();
+        // controller.nextFrame();
     }
 
     @Override
@@ -69,7 +68,6 @@ public class GameView extends PApplet implements IView {
                         boards[counter] = new Board(X, Y, sizeOfTile, sizeOfTile, this, color, i);
                         boards[counter].display();
                         counter++;
-                        // rect(X, Y, sizeOfTile, sizeOfTile, 15);
                         if (grid[i] == 1) {
                             fill(color(255));
                             ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
@@ -77,10 +75,6 @@ public class GameView extends PApplet implements IView {
                         if (grid[i] == 2) {
                             fill(color(0));
                             ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
-                            /*fill(255);
-                            textSize(60);
-                            textAlign(RIGHT);
-                            text(blackScore, width - 100, 80);*/
                         }
                         if (freemoves.contains(i)) {
                             tint(255, 128);
@@ -103,6 +97,7 @@ public class GameView extends PApplet implements IView {
 
     public void displayScore(int whiteScore, int blackScore){
         if(state == GameState.GAME_SCREEN) {
+            background(0);
             fill(255);
             textSize(60);
             textAlign(LEFT);
@@ -130,9 +125,10 @@ public class GameView extends PApplet implements IView {
         if (state == GameState.GAME_SCREEN) {
             System.out.println(mouseX + ", " + mouseY);
             for (int i = 0; i < boards.length; i++) {
-                    System.out.println(boards[i].mouseClicked(mouseX, mouseY));
-                    controller.play(boards[i].mouseClicked(mouseX, mouseY));
-
+                    if(boards[i].mouseClicked(mouseX, mouseY) != -1){
+                        System.out.println("Playing mouseAction");
+                        controller.play(boards[i].mouseClicked(mouseX, mouseY));
+                    }
 
             }
         }
