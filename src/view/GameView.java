@@ -1,19 +1,20 @@
 package view;
 
 import controller.ControllerOfGame;
+import controller.IController;
 import processing.core.PApplet;
+
+import java.util.ArrayList;
 
 
 public class GameView extends PApplet implements IView {
     public static void main(String[] args) {
-        PApplet.runSketch(new String[]{""}, new GameView());
+        PApplet.main(GameView.class);
     }
 
-    ControllerOfGame controller;
-    final int xPos = 0;
-    final int yPos = 0;
-    final int xOffSet = 150;
-    final int yOffSet = 50;
+    IController controller;
+    final int xOffSet = 180;
+    final int yOffSet = 60;
     final int sizeOfTile = 80;
     final int sizeOfBorder = 1;
     final int xDisc = sizeOfTile / 2;
@@ -31,7 +32,7 @@ public class GameView extends PApplet implements IView {
     public void setup() {
         background(0);
         this.controller = new ControllerOfGame(this);
-        controller.nextFrame();
+        //controller.nextFrame();
 
     }
 
@@ -42,11 +43,11 @@ public class GameView extends PApplet implements IView {
     }
 
     public void draw() {
-        //controller.nextFrame();
+        controller.nextFrame();
     }
 
     @Override
-    public void drawBoard(int[] grid) {
+    public void drawBoard(int[] grid, ArrayList<Integer> freemoves) {
         switch (state) {
             case TITLE_SCREEN -> {
                 background(0);
@@ -72,14 +73,16 @@ public class GameView extends PApplet implements IView {
                         if (grid[i] == 1) {
                             fill(color(255));
                             ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
-                            text(grid[i], X + sizeOfTile / 2 + 1, Y + sizeOfTile / 2 + 1);
                         }
                         if (grid[i] == 2) {
                             fill(color(0));
                             ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
-                            text(grid[i], X + sizeOfTile / 2 + 1, Y + sizeOfTile / 2 + 1);
+                            /*fill(255);
+                            textSize(60);
+                            textAlign(RIGHT);
+                            text(blackScore, width - 100, 80);*/
                         }
-                        if (grid[i] == -1) {
+                        if (freemoves.contains(i)) {
                             tint(255, 128);
                             ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
                             text(grid[i], X + sizeOfTile / 2 + 1, Y + sizeOfTile / 2 + 1);
@@ -98,17 +101,20 @@ public class GameView extends PApplet implements IView {
         }
     }
 
-    public void mouseClicked() {
-        //controller.userInput();
-        if (state == GameState.GAME_SCREEN) {
-            System.out.println(mouseX + ", " + mouseY);
-            for (int i = 0; i < boards.length; i++) {
-                if (boards[i].mouseClicked(mouseX, mouseY) != -1) {
-                    System.out.println(boards[i].mouseClicked(mouseX, mouseY));
-                    controller.play(boards[i].mouseClicked(mouseX, mouseY));
-                }
-            }
+    public void displayScore(int whiteScore, int blackScore){
+        if(state == GameState.GAME_SCREEN) {
+            fill(255);
+            textSize(60);
+            textAlign(LEFT);
+            text(whiteScore, 100, 80);
+            textAlign(RIGHT);
+            text(blackScore, width - 100, 80);
         }
+    }
+
+    public void mouseClicked() {
+        controller.userInput();
+
     }
 
 
@@ -119,28 +125,15 @@ public class GameView extends PApplet implements IView {
             controller.nextFrame();
         }
     }
-
     @Override
     public void mouseAction(int[] grid) {
-        int edge_length = Math.round(sqrt(grid.length));
-        int i = 0;
-        int X, Y;
-        for (int y = 0; y < edge_length; y++) {
-            Y = yOffSet + sizeOfBorder + y * (sizeOfTile + sizeOfBorder);
-            for (int x = 0; x < edge_length; x++) {
-                X = xOffSet + sizeOfBorder + x * (sizeOfTile + sizeOfBorder);
-               /* if (mouseX > X - sizeOfTile - 1 && mouseX < X + sizeOfTile - 1 &&
-                        mouseY > Y - sizeOfTile - 1 && mouseY < Y + sizeOfTile - 1) {
-                    System.out.println("row:"+y+"column"+x);
-                    fill(255);
-                    ellipse(X+sizeOfTile/2, Y+sizeOfTile/2,sizeOfTile-1, sizeOfTile-1);
-                    mouseOnDisc = true;
-                }
-                if (mouseOnDisc) {
-                    locked = true;
-                    fill(0);
-                    controller.userInput();
-                }*/
+        if (state == GameState.GAME_SCREEN) {
+            System.out.println(mouseX + ", " + mouseY);
+            for (int i = 0; i < boards.length; i++) {
+                    System.out.println(boards[i].mouseClicked(mouseX, mouseY));
+                    controller.play(boards[i].mouseClicked(mouseX, mouseY));
+
+
             }
         }
     }

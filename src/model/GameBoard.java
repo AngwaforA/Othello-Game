@@ -1,16 +1,12 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class GameBoard extends Thread {
     /**
      * freeMove represents the places on the board which is possible for a player to make a move
      */
-    private int blackChips = 2;
-    private int whiteChips = 2;
+
 
     int turnsWithNoFreeMove = 0;
     public int freeMove = 0;
@@ -24,6 +20,8 @@ public class GameBoard extends Thread {
      * exceeded when looking for horizontal freeMoves
      */
     int[] HigherBoundHorizontal = {7, 15, 23, 31, 39, 47, 55, 63};
+
+    ArrayList<DirectionForFreeMove> directionForFreeMoves = new ArrayList<>();
     /**
      * playerWhite is an instance of Player which represents the white chip
      */
@@ -38,14 +36,25 @@ public class GameBoard extends Thread {
      */
     public List<Integer> freeMoves = new ArrayList<>();
 
+    private int score = 0;
 
+    public List<Integer> getFreeMoves(){
+        return freeMoves;
+    }
+
+    public  GameBoard(ArrayList<Integer> freeMoves){
+        this.freeMoves = freeMoves;
+    }
+
+    public void run(){
+
+    }
     /**
      * The board of the game is represented with a single dimensional array with 64 elements
      */
-
     public int[] gameBoard = new int[64];
-    /*Consumer<Long> getBlackChips = s -> Arrays.stream(gameBoard).filter(i -> i == 2).count();
-    Consumer<Long> getWhiteChips = s -> Arrays.stream(gameBoard).filter(i -> i == 1).count();*/
+    private long blackChips =  Arrays.stream(gameBoard).filter(i -> i == 2).count();
+    private long whiteChips =  Arrays.stream(gameBoard).filter(i -> i == 1).count();
 
     int temp = 0;
     int end = 0;
@@ -71,7 +80,7 @@ public class GameBoard extends Thread {
                 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0]*/
-    public int[] temp_gameBoard = new int[gameBoard.length];
+    //public int[] temp_gameBoard = new int[gameBoard.length];
 
     /***
      * This method checks if the position where the player clicked is a valid move and then flips(changes the color)
@@ -100,46 +109,90 @@ public class GameBoard extends Thread {
             turnsWithNoFreeMove++;
         }
         if (freeMoves.contains(pos)) {
-
-            if (horizontalForwardFreeMove(pos, chip)) {
-                iterateToFlip(1, pos, chip, oppositeChip, false);
-            }
-            else if (horizontalBackwardFreeMove(pos, chip)) {
-                iterateToFlip(1, pos, chip, oppositeChip, true);
-            }
-            else if (verticalForwardFreeMove(pos, chip)) {
-                iterateToFlip(8, pos, chip, oppositeChip, false);
-            }
-            else if (verticalBackwardFreeMove(pos, chip)) {
-                iterateToFlip(8, pos, chip, oppositeChip, true);
-            }
-            else if (diagonalForwardRightFreeMove(pos, chip)) {
-                iterateToFlip(7, pos, chip, oppositeChip, true);
-            }
-            else if (diagonalBackwardRightFreeMove(pos, chip)) {
-                iterateToFlip(7, pos, chip, oppositeChip, false);
-            }
-            else if (diagonalForwardLeftFreeMove(pos, chip)) {
-                iterateToFlip(9, pos, chip, oppositeChip, true);
-            }
-            else if (diagonalBackwardLeftFreeMove(pos, chip)) {
-                iterateToFlip(9, pos, chip, oppositeChip, false);
-            }
             gameBoard[pos] = chip;
-            System.arraycopy(gameBoard, 0, temp_gameBoard, 0, temp_gameBoard.length);
-            for (int i = 0; i < gameBoard.length; i++) {
-                if (gameBoard[i] == -1) {
-                    gameBoard[i] = 0;
+            for(int i = 0;i < directionForFreeMoves.size();i++) {
+                if(directionForFreeMoves.get(i).position == pos) {
+                    switch (directionForFreeMoves.get(i).direction) {
+                        case "horizontalBackward":
+                            iterateToFlip(1, pos , chip, oppositeChip, true);
+                            break;
+
+                        case "horizontalForward":
+                            iterateToFlip(1, pos , chip, oppositeChip, false);
+                            break;
+
+                        case "verticalForward":
+                            iterateToFlip(8, pos, chip, oppositeChip, false);
+                            break;
+                        case "verticalBackward":
+                            iterateToFlip(8, pos, chip, oppositeChip, true);
+                            break;
+
+                        case "diagonalForwardRight":
+                            iterateToFlip(9, pos, chip, oppositeChip, false);
+                            break;
+
+                        case "diagonalForwardLeft":
+                            iterateToFlip(7, pos, chip, oppositeChip, false);
+                            break;
+                        case "diagonalBackwardLeft":
+                            iterateToFlip(9, pos, chip, oppositeChip, true);
+                            break;
+                        case "diagonalBackwardRight":
+                            iterateToFlip(7, pos, chip, oppositeChip, true);
+                            break;
+
+
+                    }
                 }
             }
+
+            /*if (verticalForwardFreeMove(pos, chip)) {
+                iterateToFlip(8, pos, chip, oppositeChip, false);
+            }
+            if (verticalBackwardFreeMove(pos, chip)) {
+                iterateToFlip(8, pos, chip, oppositeChip, true);
+            }
+            if (diagonalForwardRightFreeMove(pos, chip)) {
+                iterateToFlip(7, pos, chip, oppositeChip, false);
+            }
+            if (diagonalBackwardRightFreeMove(pos, chip)) {
+                iterateToFlip(7, pos, chip, oppositeChip, true);
+            }
+            if (diagonalForwardLeftFreeMove(pos, chip)) {
+                iterateToFlip(9, pos, chip, oppositeChip, true);
+            }
+            if (diagonalBackwardLeftFreeMove(pos, chip)) {
+                iterateToFlip(9, pos, chip, oppositeChip, false);
+            }
+            if (horizontalForwardFreeMove(pos, chip)) {
+                    iterateToFlip(1, pos, chip, oppositeChip, false);
+            }
+            if (horizontalBackwardFreeMove(pos, chip)) {
+                    iterateToFlip(1, pos, chip, oppositeChip, true);
+            }*/
             switchTurns();
             freeMoves.clear();
+            directionForFreeMoves.clear();
             turnsWithNoFreeMove = 0;
         }
     }
 
+    void iterateToFlip(int steps,int pos,int chip,int oppositeChip,boolean isIncreasing){
+        if(!isIncreasing) {
+            steps = steps * -1;
+        }
+        pos = pos + steps;
+        while(gameBoard[pos] == oppositeChip) {
+
+            gameBoard[pos] = chip;
+            pos = pos + steps;
+        }
+
+    }
+
     public void cpuMove() {
-        int chip = playerWhite.getTurn() ? 1 : 2;
+        int chip = playerBlack.getTurn() ? 2 : 1;
         if (playerBlack.getTurn()) {
             iterateGameBoardForFreeMove(chip);
         }
@@ -170,20 +223,22 @@ public class GameBoard extends Thread {
     /**
      * This method flips all the chips surrounded by the opponent chip when called in move
      */
-    void iterateToFlip(int steps, int pos, int chip, int oppositeChip, boolean isIncreasing) {
+    /*void iterateToFlip(int steps, int pos, int chip, int oppositeChip, boolean isIncreasing) {
+        tempPos = pos;
         if (!isIncreasing) {
             steps = steps * -1;
         }
         System.out.println("oppositechip " + oppositeChip);
-         pos = pos + steps;
+         pos = pos + steps;        //Goes to the first chip to be flipped. If not while loop ends without even starting.
         System.out.printf("while %d == %d ", gameBoard[pos], oppositeChip);
 
         while (gameBoard[pos] == oppositeChip) {
-            System.out.println(oppositeChip);
-            gameBoard[pos] = chip;
+            //gameBoard[pos] = chip;
+
             pos = pos + steps;
         }
-    }
+        pos = tempPos;
+    }*/
 
     /**
      * This method collects all the possible freeMoves upwards,downward,sideways and diagonal
@@ -222,17 +277,20 @@ public class GameBoard extends Thread {
             }
         }
         for (int i = pos; i >= end; i--) {
-            if (gameBoard[i] == 0 || gameBoard[i] == -1) {
+            if (gameBoard[i] == 0 ) {
                 temp = i;
                 break;
             }
         }
-        if (gameBoard[temp + 1] == oppositeChip) {
-            gameBoard[temp] = -1;
-            freeMoves.add(temp);
-            return true;
+        if(temp + 1 <64) {
+            if (gameBoard[temp + 1] == oppositeChip ) {
+                freeMoves.add(temp);
+                directionForFreeMoves.add(new DirectionForFreeMove(temp,"horizontalBackward"));
+                return true;
+            }
         }
         return false;
+
     }
 
     /**
@@ -246,16 +304,18 @@ public class GameBoard extends Thread {
             }
         }
         for (int i = pos; i <= end; i++) {
-            if (gameBoard[i] == 0 || gameBoard[i] == -1) {
+            if (gameBoard[i] == 0 ) {
                 temp = i;
                 break;
             }
         }
-        if (gameBoard[temp - 1] == oppositeChip) {
-            gameBoard[temp] = -1;
-            freeMoves.add(temp);
-            return true;
-        }
+        if(temp-1 >= 0)
+            if (gameBoard[temp - 1] == oppositeChip ) {
+                directionForFreeMoves.add(new DirectionForFreeMove(temp,"horizontalForward"));
+                freeMoves.add(temp);
+                return true;
+            }
+
         return false;
     }
 
@@ -264,18 +324,20 @@ public class GameBoard extends Thread {
      */
     boolean verticalBackwardFreeMove(int pos, int chip) {
         int counter = pos;
-        while (counter >= 0) {
-            if (gameBoard[counter] == 0 || gameBoard[counter] == -1) {
+        while (counter >= 0 && counter < 64) {
+            if (gameBoard[counter] == 0 ) {
                 end = counter;
                 break;
             }
             counter = counter - 8;
         }
-        if (gameBoard[end + 8] != chip) {
-            gameBoard[end] = -1;
-            freeMoves.add(end);
+        if(end+8 < 64) {
+        if (gameBoard[end + 8] != chip && gameBoard[end + 8] != 0) {
+                directionForFreeMoves.add(new DirectionForFreeMove(end,"verticalBackward"));
+                freeMoves.add(end);
 
-            return true;
+                return true;
+            }
         }
         return false;
     }
@@ -289,18 +351,18 @@ public class GameBoard extends Thread {
      */
     boolean verticalForwardFreeMove(int pos, int chip) {
         int counter = pos;
-        while (counter <= gameBoard.length) {
-            if(counter > 0 || counter < 63) {
-                if (gameBoard[counter] == 0 || gameBoard[counter] == -1) {
+
+            while (counter < gameBoard.length) {
+                if (gameBoard[counter] == 0 ) {
                     end = counter;
                     break;
                 }
                 counter = counter + 8;
             }
-        }
-        if(end - 8 > 0 )
-            if (gameBoard[end - 8] != chip) {
-                gameBoard[end] = -1;
+
+        if(end - 8 >= 0 )
+            if (gameBoard[end - 8] != chip ) {
+                directionForFreeMoves.add(new DirectionForFreeMove(end,"verticalForward"));
                 freeMoves.add(end);
                 return true;
             }
@@ -308,22 +370,25 @@ public class GameBoard extends Thread {
         return false;
     }
 
+
     /**
      * Checks for free moves diagonally in a forward direction to the right in reference to one player only
      */
     boolean diagonalForwardRightFreeMove(int pos, int chip) {
         int counter = pos;
-        while (counter <= gameBoard.length) {
-            if (gameBoard[counter] == 0 || gameBoard[counter] == -1) {
+        while (counter < gameBoard.length) {
+            if (gameBoard[counter] == 0 ) {
                 end = counter;
                 break;
             }
-            counter += 7;
+            counter += 9;
         }
-        if (gameBoard[end - 7] != chip) {
-            gameBoard[end] = -1;
-            freeMoves.add(end);
-            return true;
+        if(end-9 >= 0) {
+            if (gameBoard[end - 9] != chip ) {
+                directionForFreeMoves.add(new DirectionForFreeMove(end,"diagonalForwardRight"));
+                freeMoves.add(end);
+                return true;
+            }
         }
         return false;
     }
@@ -333,19 +398,21 @@ public class GameBoard extends Thread {
      */
     boolean diagonalForwardLeftFreeMove(int pos, int chip) {
         int counter = pos;
-        while (counter <= gameBoard.length) {
-            if (gameBoard[counter] == 0 || gameBoard[counter] == -1) {
+        while (counter < gameBoard.length) {
+            if (gameBoard[counter] == 0) {
                 end = counter;
                 break;
             }
-            if(counter+9 < gameBoard.length) {
-                counter += 9;
+            if(counter+7 < gameBoard.length) {
+                counter += 7;
             }
         }
-        if (gameBoard[end - 9] != chip) {
-            gameBoard[end] = -1;
-            freeMoves.add(end);
-            return true;
+        if(end-7 >= 0) {
+            if (gameBoard[end - 7] != chip) {
+                freeMoves.add(end);
+                directionForFreeMoves.add(new DirectionForFreeMove(end,"diagonalForwardLeft"));
+                return true;
+            }
         }
         return false;
     }
@@ -356,16 +423,18 @@ public class GameBoard extends Thread {
     boolean diagonalBackwardLeftFreeMove(int pos, int chip) {
         int counter = pos;
         while (counter >= 0) {
-            if (gameBoard[counter] == 0 || gameBoard[counter] == -1) {
+            if (gameBoard[counter] == 0 ) {
                 end = counter;
                 break;
             }
             counter -= 9;
         }
-        if (gameBoard[end + 9] != chip) {
-            gameBoard[end] = -1;
-            freeMoves.add(end);
-            return true;
+        if(9+end < 64) {
+            if (gameBoard[end + 9] != chip ) {
+                freeMoves.add(end);
+                directionForFreeMoves.add(new DirectionForFreeMove(end,"diagonalBackwardLeft"));
+                return true;
+            }
         }
         return false;
     }
@@ -376,16 +445,18 @@ public class GameBoard extends Thread {
     boolean diagonalBackwardRightFreeMove(int pos, int chip) {
         int counter = pos;
         while (counter >= 0) {
-            if (gameBoard[counter] == 0 || gameBoard[counter] == -1) {
+            if (gameBoard[counter] == 0) {
                 end = counter;
                 break;
             }
             counter -= 7;
         }
-        if (gameBoard[end + 7] != chip) {
-            gameBoard[end] = -1;
-            freeMoves.add(end);
-            return true;
+        if(end + 7 < 64) {
+            if (gameBoard[end + 7] != chip ) {
+                directionForFreeMoves.add(new DirectionForFreeMove(end,"diagonalBackwardRight"));
+                freeMoves.add(end);
+                return true;
+            }
         }
         return false;
     }
@@ -407,6 +478,38 @@ public class GameBoard extends Thread {
         return null;
     }
 
+    public int getWinnerScore() {
+        if(gameover()) {
+            if (playerWhiteScore() < playerBlackScore()) {
+                return playerBlackScore();
+            }
+            return playerWhiteScore();
+        }
+        return playerBlackScore();
+    }
+
+    public int playerWhiteScore(){
+        score = 0;
+        for(int i = 0; i< gameBoard.length; i++){
+            if(gameBoard[i] == 1){
+                score++;
+            }
+        }
+        //System.out.println("playerWhite:" + score1);
+        return score;
+
+    }
+
+    public int playerBlackScore(){
+        score = 0;
+        for(int i = 0; i< gameBoard.length; i++){
+            if(gameBoard[i] == 2){
+                score ++;
+            }
+        }
+        //System.out.println("playerBlack:" + score2);
+        return score;
+    }
     public String toString() {
         String s = "";
         for (int j = 0; j < gameBoard.length; j++) {
@@ -415,6 +518,13 @@ public class GameBoard extends Thread {
         }
         return s;
     }
+    /*public  int getPlayerWhiteScore(){
+        return (int)whiteChips;
+    }
+
+    public int getPlayerBlackScore(){
+        return (int)blackChips;
+    }*/
 
 }
 
