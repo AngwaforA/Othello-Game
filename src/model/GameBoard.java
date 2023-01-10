@@ -464,6 +464,7 @@ public class GameBoard{
             }
             counter -= 7;
         }
+        System.out.println("Yes");
         if(end + 7 < 64) {
             if (gameBoard[end + 7] != chip ) {
                 directionForFreeMoves.add(new DirectionForFreeMove(end,"diagonalBackwardRight"));
