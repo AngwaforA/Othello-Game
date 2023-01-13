@@ -1,10 +1,11 @@
 package view;
 
 import controller.ControllerOfGame;
+import controller.GameState;
 import controller.IController;
 import processing.core.PApplet;
 
-import java.util.ArrayList;
+import java.util.List;
 
 
 public class GameView extends PApplet implements IView {
@@ -25,7 +26,7 @@ public class GameView extends PApplet implements IView {
     Board[] boards = new Board[64];
 
     public void settings() {
-        super.size(1000, 700);
+        super.size(1000, 750);
     }
 
     public void setup() {
@@ -44,66 +45,67 @@ public class GameView extends PApplet implements IView {
     public void draw() {
         // controller.nextFrame();
     }
+    public void drawTitleScreen(){
+        background(0);
+        fill(255);
+        textSize(60);
+        textAlign(CENTER);
+        text("**Welcome to Othello**\n Press Enter Key To Start", width / 2, height / 2);
+    }
 
     @Override
-    public void drawBoard(int[] grid, ArrayList<Integer> freemoves) {
-        switch (state) {
-            case TITLE_SCREEN -> {
-                background(0);
-                fill(255);
-                textSize(60);
-                textAlign(CENTER);
-                text("**Welcome to Othello**\n Press Enter Key To Start", width / 2, height / 2);
-            }
-            case GAME_SCREEN -> {
-                int edge_length = Math.round(sqrt(grid.length));
-                int i = 0;
-                int X, Y;
-                int counter = 0;
-                for (int y = 0; y < edge_length; y++) {
-                    Y = yOffSet + sizeOfBorder + y * (sizeOfTile + sizeOfBorder);
-                    for (int x = 0; x < edge_length; x++) {
-                        X = xOffSet + sizeOfBorder + x * (sizeOfTile + sizeOfBorder);
-                        int color = color(30 + log(grid[i] + 1) / log(2) * 10, 90, 80);
-                        boards[counter] = new Board(X, Y, sizeOfTile, sizeOfTile, this, color, i);
-                        boards[counter].display();
-                        counter++;
-                        if (grid[i] == 1) {
-                            fill(color(255));
-                            ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
-                        }
-                        if (grid[i] == 2) {
-                            fill(color(0));
-                            ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
-                        }
-                        if (freemoves.contains(i)) {
-                            tint(255, 128);
-                            ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
-                            text(grid[i], X + sizeOfTile / 2 + 1, Y + sizeOfTile / 2 + 1);
-                        }
-                        i++;
+    public void drawGameOver(String winner) {
+        background(0);
+        fill(255);
+        textSize(60);
+        textAlign(CENTER);
+        text("**GameOver**", width / 2, height / 2);
+        text(winner + " won", width / 2, height / 2 + 70);
+    }
+
+    @Override
+    public void drawBoard(int[] grid, List<Integer> freemoves) {
+        if (state == GameState.GAME_SCREEN) {
+            int edge_length = Math.round(sqrt(grid.length));
+            int i = 0;
+            int X, Y;
+            int counter = 0;
+            for (int y = 0; y < edge_length; y++) {
+                Y = yOffSet + sizeOfBorder + y * (sizeOfTile + sizeOfBorder);
+                for (int x = 0; x < edge_length; x++) {
+                    X = xOffSet + sizeOfBorder + x * (sizeOfTile + sizeOfBorder);
+                    int color = color(30 + log(grid[i] + 1) / log(2) * 10, 90, 80);
+                    boards[counter] = new Board(X, Y, sizeOfTile, sizeOfTile, this, color, i);
+                    boards[counter].display();
+                    counter++;
+                    if (grid[i] == 1) {
+                        fill(color(255));
+                        ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
                     }
+                    if (grid[i] == 2) {
+                        fill(color(0));
+                        ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
+                    }
+                    if (freemoves.contains(i)) {
+                        tint(255, 128);
+                        ellipse(X + sizeOfTile / 2, Y + sizeOfTile / 2, sizeOfTile - 1, sizeOfTile - 1);
+                        text(grid[i], X + sizeOfTile / 2 + 1, Y + sizeOfTile / 2 + 1);
+                    }
+                    i++;
                 }
-            }
-            case GAMEOVER -> {
-                background(0);
-                fill(255);
-                textSize(60);
-                textAlign(CENTER);
-                text("**GameOver**", width / 2, height / 2);
             }
         }
     }
 
-    public void displayScore(int whiteScore, int blackScore){
-        if(state == GameState.GAME_SCREEN) {
+    public void displayScore(int whiteScore, int blackScore) {
+        if (state == GameState.GAME_SCREEN) {
             background(0);
             fill(255);
-            textSize(60);
+            textSize(40);
             textAlign(LEFT);
-            text(whiteScore, 100, 80);
+            text("White:" + whiteScore, 30, 80);
             textAlign(RIGHT);
-            text(blackScore, width - 100, 80);
+            text("Black:" +blackScore, width - 30, 80);
         }
     }
 
@@ -120,15 +122,17 @@ public class GameView extends PApplet implements IView {
             controller.nextFrame();
         }
     }
+
     @Override
     public void mouseAction(int[] grid) {
         if (state == GameState.GAME_SCREEN) {
             System.out.println(mouseX + ", " + mouseY);
             for (int i = 0; i < boards.length; i++) {
-                    if(boards[i].mouseClicked(mouseX, mouseY) != -1){
-                        System.out.println("Playing mouseAction");
-                        controller.play(boards[i].mouseClicked(mouseX, mouseY));
-                    }
+                int boardClicked = boards[i].mouseClicked(mouseX, mouseY);
+                if (boardClicked != -1) {
+                    System.out.println("Playing mouseAction");
+                    controller.play(boardClicked);
+                }
 
             }
         }

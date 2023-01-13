@@ -8,6 +8,7 @@ public class Main {
         System.out.println("winner is" + gameBoard.getWinner());
         gameBoard.getWinner();
 
+
     }
                     /*if (horizontalBackwardFreeMove(i, chip)) {
                     System.out.println("pos: " + i + "horizontalBackwardFreeMove:" + freeMove);

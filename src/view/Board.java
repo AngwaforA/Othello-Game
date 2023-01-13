@@ -1,6 +1,6 @@
 package view;
 
-public class Board  {
+public class Board {
     int xPos = 0;
     int yPos = 0;
     int xOffSet = 150;
@@ -25,7 +25,7 @@ public class Board  {
 
     public int mouseClicked(int x, int y) {
         if (x > xPos && x < xPos + xOffSet && y > yPos && y < yPos + yOffSet) {
-            //System.out.println("row:" + row + "column" + column);
+            System.out.println("position :" +( position + 1));
             return position;
         }
         return -1;
